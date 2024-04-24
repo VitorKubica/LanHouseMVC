@@ -48,7 +48,12 @@ namespace LanHouseMVC.Controllers
         // GET: InfoContato/Create
         public IActionResult Create()
         {
-            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome");
+            // Filtra os clientes que ainda não têm infoContato associado
+            var clientesSemInfoContato = _context.Clientes
+                .Where(c => !_context.InfoContato.Any(ic => ic.ClienteId == c.Id))
+                .ToList();
+
+            ViewData["ClienteId"] = new SelectList(clientesSemInfoContato, "Id", "Nome");
             return View();
         }
 
