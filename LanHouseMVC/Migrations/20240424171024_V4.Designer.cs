@@ -3,6 +3,7 @@ using System;
 using LanHouseMVC.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oracle.EntityFrameworkCore.Metadata;
 
@@ -11,9 +12,11 @@ using Oracle.EntityFrameworkCore.Metadata;
 namespace LanHouseMVC.Migrations
 {
     [DbContext(typeof(FiapDbContext))]
-    partial class FiapDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240424171024_V4")]
+    partial class V4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,11 +38,16 @@ namespace LanHouseMVC.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("NVARCHAR2(11)");
 
+                    b.Property<int?>("InfoContatoId")
+                        .HasColumnType("NUMBER(10)");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("NVARCHAR2(2000)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InfoContatoId");
 
                     b.ToTable("TB_Clientes");
                 });
@@ -69,9 +77,6 @@ namespace LanHouseMVC.Migrations
 
                     OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ClienteId")
-                        .HasColumnType("NUMBER(10)");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("NVARCHAR2(2000)");
@@ -81,8 +86,6 @@ namespace LanHouseMVC.Migrations
                         .HasColumnType("NVARCHAR2(2000)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClienteId");
 
                     b.ToTable("TB_InfoContato");
                 });
@@ -139,15 +142,13 @@ namespace LanHouseMVC.Migrations
                     b.ToTable("TB_Reserva");
                 });
 
-            modelBuilder.Entity("LanHouseMVC.Models.InfoContato", b =>
+            modelBuilder.Entity("LanHouseMVC.Models.Cliente", b =>
                 {
-                    b.HasOne("LanHouseMVC.Models.Cliente", "Cliente")
+                    b.HasOne("LanHouseMVC.Models.InfoContato", "InfoContato")
                         .WithMany()
-                        .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("InfoContatoId");
 
-                    b.Navigation("Cliente");
+                    b.Navigation("InfoContato");
                 });
 
             modelBuilder.Entity("LanHouseMVC.Models.Periferico", b =>
