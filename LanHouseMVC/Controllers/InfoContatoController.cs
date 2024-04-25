@@ -10,23 +10,23 @@ using LanHouseMVC.Persistence;
 
 namespace LanHouseMVC.Controllers
 {
-    public class AplicativosController : Controller
+    public class InfoContatoController : Controller
     {
         private readonly FiapDbContext _context;
 
-        public AplicativosController(FiapDbContext context)
+        public InfoContatoController(FiapDbContext context)
         {
             _context = context;
         }
 
-        // GET: Aplicativos
+        // GET: InfoContato
         public async Task<IActionResult> Index()
         {
-            var fiapDbContext = _context.Aplicativo.Include(a => a.Computador);
+            var fiapDbContext = _context.InfoContato.Include(i => i.Cliente);
             return View(await fiapDbContext.ToListAsync());
         }
 
-        // GET: Aplicativos/Details/5
+        // GET: InfoContato/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,42 +34,47 @@ namespace LanHouseMVC.Controllers
                 return NotFound();
             }
 
-            var aplicativo = await _context.Aplicativo
-                .Include(a => a.Computador)
+            var infoContato = await _context.InfoContato
+                .Include(i => i.Cliente)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (aplicativo == null)
+            if (infoContato == null)
             {
                 return NotFound();
             }
 
-            return View(aplicativo);
+            return View(infoContato);
         }
 
-        // GET: Aplicativos/Create
+        // GET: InfoContato/Create
         public IActionResult Create()
         {
-            ViewData["ComputadorId"] = new SelectList(_context.Computador, "Id", "Nome");
+            // Filtra os clientes que ainda não têm infoContato associado
+            var clientesSemInfoContato = _context.Clientes
+                .Where(c => !_context.InfoContato.Any(ic => ic.ClienteId == c.Id))
+                .ToList();
+
+            ViewData["ClienteId"] = new SelectList(clientesSemInfoContato, "Id", "Nome");
             return View();
         }
 
-        // POST: Aplicativos/Create
+        // POST: InfoContato/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Tipo,Nome,ComputadorId")] Aplicativo aplicativo)
+        public async Task<IActionResult> Create([Bind("Id,Telefone,Email,ClienteId")] InfoContato infoContato)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(aplicativo);
+                _context.Add(infoContato);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ComputadorId"] = new SelectList(_context.Computador, "Id", "Nome", aplicativo.ComputadorId);
-            return View(aplicativo);
+            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", infoContato.ClienteId);
+            return View(infoContato);
         }
 
-        // GET: Aplicativos/Edit/5
+        // GET: InfoContato/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,23 +82,23 @@ namespace LanHouseMVC.Controllers
                 return NotFound();
             }
 
-            var aplicativo = await _context.Aplicativo.FindAsync(id);
-            if (aplicativo == null)
+            var infoContato = await _context.InfoContato.FindAsync(id);
+            if (infoContato == null)
             {
                 return NotFound();
             }
-            ViewData["ComputadorId"] = new SelectList(_context.Computador, "Id", "Nome", aplicativo.ComputadorId);
-            return View(aplicativo);
+            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", infoContato.ClienteId);
+            return View(infoContato);
         }
 
-        // POST: Aplicativos/Edit/5
+        // POST: InfoContato/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Tipo,Nome,ComputadorId")] Aplicativo aplicativo)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Telefone,Email,ClienteId")] InfoContato infoContato)
         {
-            if (id != aplicativo.Id)
+            if (id != infoContato.Id)
             {
                 return NotFound();
             }
@@ -102,12 +107,12 @@ namespace LanHouseMVC.Controllers
             {
                 try
                 {
-                    _context.Update(aplicativo);
+                    _context.Update(infoContato);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AplicativoExists(aplicativo.Id))
+                    if (!InfoContatoExists(infoContato.Id))
                     {
                         return NotFound();
                     }
@@ -118,11 +123,11 @@ namespace LanHouseMVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ComputadorId"] = new SelectList(_context.Computador, "Id", "Nome", aplicativo.ComputadorId);
-            return View(aplicativo);
+            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", infoContato.ClienteId);
+            return View(infoContato);
         }
 
-        // GET: Aplicativos/Delete/5
+        // GET: InfoContato/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -130,35 +135,35 @@ namespace LanHouseMVC.Controllers
                 return NotFound();
             }
 
-            var aplicativo = await _context.Aplicativo
-                .Include(a => a.Computador)
+            var infoContato = await _context.InfoContato
+                .Include(i => i.Cliente)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (aplicativo == null)
+            if (infoContato == null)
             {
                 return NotFound();
             }
 
-            return View(aplicativo);
+            return View(infoContato);
         }
 
-        // POST: Aplicativos/Delete/5
+        // POST: InfoContato/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var aplicativo = await _context.Aplicativo.FindAsync(id);
-            if (aplicativo != null)
+            var infoContato = await _context.InfoContato.FindAsync(id);
+            if (infoContato != null)
             {
-                _context.Aplicativo.Remove(aplicativo);
+                _context.InfoContato.Remove(infoContato);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AplicativoExists(int id)
+        private bool InfoContatoExists(int id)
         {
-            return _context.Aplicativo.Any(e => e.Id == id);
+            return _context.InfoContato.Any(e => e.Id == id);
         }
     }
 }

@@ -16,7 +16,5 @@ namespace LanHouseMVC.Models
         [MaxLength(11, ErrorMessage = "O CPF deve conter no máximo 11 caracteres.")]
         public string CPF { get; set; }
 
-        [Phone(ErrorMessage ="Esse número de telefone é inválido")]
-        public string Telefone { get; set; }
     }
 }
