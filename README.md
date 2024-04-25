@@ -22,3 +22,25 @@ Seja bem-vindo ao repositório do nosso projeto LanHouse, desenvolvido para o Ch
       </a>
     </td>
 </table>
+
+## 🚀 Arquitetura do Projeto
+
+    lanhuse - 5 entidades
+    computador - int Id, string Nome
+    perifericos - int Id, string tipo, string marca, int ComputadorId
+    cliente -  int Id, string nome, string CPF
+    InfoContato - int Id, string Telefone, string Email, ClienteId
+    reserva - int Id ,computador Computador, cliente Cliente, dateTime Data
+    
+    computador - perifericos 1-n
+    resreva - cliente 1-n
+    reserva - computador 1-n
+    cliente - InfoContato 1-1
+
+    crud Computador
+    crud perifericos
+    crud cliente
+    crud InfoContato 
+    crud reserva
+
+
